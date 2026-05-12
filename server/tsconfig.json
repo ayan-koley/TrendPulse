@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "module": "nodenext",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["node"],
+    "moduleResolution": "nodenext",
+
+    // Other Outputs
+    "sourceMap": true,
+
+    // Recommended Options
+    "strict": true,
+    "skipLibCheck": true,
+
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src"]
+}
