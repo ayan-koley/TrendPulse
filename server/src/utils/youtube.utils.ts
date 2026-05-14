@@ -1,3 +1,5 @@
+import { countries } from "../models/trends.models.ts";
+
 export const YOUTUBE_CATEGORIES = {
     "1": "Film",
     "10": "Music",
@@ -12,18 +14,18 @@ export const YOUTUBE_CATEGORIES = {
 } as const;
 
 export const YOUTUBE_COUNTRY = {
-    "te": "IN",
-    "hi": "IN",
-    "en": "US",
-    "ja": "JP",
-    "ko": "KR",
-    "pt": "BR",
-    "es": "ES", 
-    "fr": "FR",
-    "de": "DE", 
-    "ar": "SA",
-    "en-IN": "IN",
-    "en-US": "US"
+    "en": 0,
+    "en-US": 0,
+    "te": 1,
+    "hi": 1,
+    "en-IN": 1,
+    "de": 5, 
+    "fr": 6,
+    "ja": 7,
+    "es": 8, 
+    "pt": 9,
+    "ko": 10,
+    "ar": 11,
 } as const;
 
 export function getYoutubeCategory(id: string) {
@@ -31,5 +33,5 @@ export function getYoutubeCategory(id: string) {
 }
 
 export function getYoutubeCountry(lang: string) {
-    return YOUTUBE_COUNTRY[lang as keyof typeof YOUTUBE_COUNTRY] || "US";
+    return countries[YOUTUBE_COUNTRY[lang as keyof typeof YOUTUBE_COUNTRY] || 0];
 }
