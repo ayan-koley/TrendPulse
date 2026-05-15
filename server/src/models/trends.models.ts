@@ -1,7 +1,7 @@
 import { integer, pgEnum, pgTable, varchar, text, numeric, timestamp, uuid, boolean } from 'drizzle-orm/pg-core'
-import { platformsTable } from './index.ts'
+import { platformsTable } from './platforms.models.ts'
 
-const countries = ["US", "IN", "UK", "CA", "AU", "DE", "FR", "JP"] as const;
+export const countries = ["US", "IN", "UK", "CA", "AU", "DE", "FR", "JP", "ES", "BR", "KR", "SA"] as const;
 
 export type TrendCountry = (typeof countries)[number];
 
@@ -16,7 +16,7 @@ export const trendsTable = pgTable('trends', {
     language: varchar('language', { length: 50 }).notNull().default('en'),
     trend_score: integer('trend_score').notNull(),
     velocity_score: integer('velocity_score').notNull(), 
-    sentiment_score: numeric('sentiment_score', { precision: 3, scale: 2 }).notNull(),
+    sentiment_score: numeric('sentiment_score', { precision: 3, scale: 2, mode: "number" }).notNull(),
     engagement_count: integer('engagement_count').default(0).notNull(),
     post_count: integer('post_count').default(0).notNull(),
     rank_position: integer('rank_position').notNull(),
