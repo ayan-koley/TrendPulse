@@ -1,9 +1,9 @@
 import { db } from "../../config/db.ts";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { platformsTable } from "../../models/platforms.models.ts";
 import type { UpdatePlatformPayload } from "../types/platform.types.ts";
 
-export const updatePlatformById = async(
+const updatePlatformById = async(
     platformId: string,
     platform: UpdatePlatformPayload
 ) => {
@@ -19,4 +19,19 @@ export const updatePlatformById = async(
         console.error("ERROR on update platform by id ", e.message);
         throw e;
     }
+}
+
+const incrementPlatformRequestUsedById = async(platformId: string) => {
+    try {
+        return await db.update(platformsTable).set({
+            requests_used: sql`${platformsTable.requests_used} + 1`
+        }).where(eq(platformsTable.id, platformId));
+    } catch (error: any) {
+        console.error("ERROR on increment request used ", error.message);
+    }
+}
+
+export {
+    updatePlatformById,
+    incrementPlatformRequestUsedById
 }
