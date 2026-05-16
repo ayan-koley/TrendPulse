@@ -1,7 +1,7 @@
 import { integer, pgEnum, pgTable, boolean, timestamp, uuid } from 'drizzle-orm/pg-core'
 
-const platformNames = ["youtube", "reddit", "twitter", "instagram"] as const;
-const apiStatuses = ["active", "limited", "down"] as const;
+export const platformNames = ["youtube", "reddit", "twitter", "instagram"] as const;
+export const apiStatuses = ["active", "limited", "down"] as const;
 
 export type PlatformName = (typeof platformNames)[number];
 export type ApiStatus = (typeof apiStatuses)[number];
