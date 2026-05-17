@@ -40,12 +40,15 @@ export type Hashtags = {
     last_updated_at: Date
 }
 export type NormalizedVideo = {
-    title: string,
-    hashtags: string[],
-    country: TrendCountry,
-    engagement: number,
-    publishedAt: Date,
-    platform: PlatformName
+    title: string;
+    hashtags: string[];
+    country: TrendCountry;
+    engagement: number;
+    publishedAt: Date;
+    platform: PlatformName;
+    views: number;
+    lang: string;
+    category: string;
 }
 
 export function normalizeYouTube(items: Item[]) {
@@ -68,27 +71,11 @@ export function normalizeYouTube(items: Item[]) {
             engagement,
             hashtags,
             platform: "youtube",
-            publishedAt: new Date(snippet.publishedAt)
+            publishedAt: new Date(snippet.publishedAt),
+            views,
+            lang,
+            category
         }
-
-        const trendingTopics: TrendingTopics = {
-            topic: snippet.title,
-            category,
-            country,
-            language: lang,
-            trend_score: calculateTrendScore(engagement),
-            velocity_score: calculateVelocityScore(snippet.publishedAt),
-            sentiment_score: calculateSentimentScore(snippet.title),
-            engagement_count: engagement,
-            post_count: 1,
-            rank_position: 0,
-            rank_change: 0,
-            related_hashtags: hashtags,
-            is_active: true,
-            first_detected_at: new Date(snippet.publishedAt),
-            last_updated_at: new Date()
-        }
-
 
         const hashtagRows: Hashtags[] = hashtags.map((tag) => ({
             hashtag: tag,
@@ -104,6 +91,6 @@ export function normalizeYouTube(items: Item[]) {
             last_updated_at: new Date()
         }))
 
-        return { trendingTopics, hashtagRows }
+        return { normalizedVideo, hashtagRows }
     })
 }
