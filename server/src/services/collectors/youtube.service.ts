@@ -57,7 +57,8 @@ export type YoutubeResponse = {
     }
 }
 
-export async function generateTrendingVideos(): Promise<YoutubeResponse> {
+// export async function generateTrendingVideos(): Promise<YoutubeResponse> {
+export async function generateYoutubeTrendingVideos(): Promise<YoutubeResponse> {
     try {
         const response: YoutubeResponse = await axios.get('https://www.googleapis.com/youtube/v3/videos', {
             params: {
@@ -68,6 +69,7 @@ export async function generateTrendingVideos(): Promise<YoutubeResponse> {
                 key: process.env.YOUTUBE_API_KEY
             }
         }).then(d => d.data)
+
         return response;
     } catch (e: any) {
         if(axios.isAxiosError(e)) {
