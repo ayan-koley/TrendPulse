@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/index.ts"
+    "dev": "node ./dist/index.js",
+    "seed:platforms": "node ./dist/platforms/seed/run.seed.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "axios": "^1.16.0",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "pg": "^8.20.0",
