@@ -1,11 +1,9 @@
 import { calculateTrendScore } from "../../utils/trendScore.utils.ts";
 import type { NormalizedVideo } from "../normalizers/youtube.normalizer.ts";
 import { type TrendingTopics } from "../normalizers/youtube.normalizer.ts";
-import { calculateMetrics } from "./calculateMetrics.ts";
+import { calculateMetrics, type TrendMetrics } from "./calculateMetrics.ts";
 
-export const createTrendFromGroup = (hashtag: string, videos: NormalizedVideo[]) => {
-
-    const metrics = calculateMetrics(videos);
+export const createTrendFromGroup = (hashtag: string, videos: NormalizedVideo[], metrics: TrendMetrics) => {
 
     const engagementCount = metrics.engagementCount;
     const velocityScore = metrics.velocityScore;
