@@ -15,7 +15,7 @@ export const trendsTable = pgTable('trends', {
     country: countryEnum('country').notNull(),
     language: varchar('language', { length: 50 }).notNull().default('en'),
     trend_score: integer('trend_score').notNull(),
-    velocity_score: integer('velocity_score').notNull(), 
+    velocity_score: numeric('velocity_score', { precision: 5, scale: 2, mode: "number" }).notNull(), 
     sentiment_score: numeric('sentiment_score', { precision: 3, scale: 2, mode: "number" }).notNull(),
     engagement_count: integer('engagement_count').default(0).notNull(),
     post_count: integer('post_count').default(0).notNull(),
