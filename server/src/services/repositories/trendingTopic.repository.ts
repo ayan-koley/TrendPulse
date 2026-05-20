@@ -17,7 +17,7 @@ const insertTrendingTopic = async(platformId: string, trending: TrendingTopics) 
         return await db.insert(trendsTable).values({
             platform_id: isValidPlatformId[0].id,
             ...trending,
-        });
+        }).returning({id: trendsTable.id, trend_score: trendsTable.trend_score});
     } catch (error: any) {
         // console.log("ERROR payload ", trending);
         // console.error("ERROR on inserting trending topics ", error.message);
