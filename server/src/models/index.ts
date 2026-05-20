@@ -1,6 +1,6 @@
 import { usersTable, userRoleEnum, userSubscriptionEnum } from './users.models.ts'
 import { platformsTable, platformNameEnum, apiStatusEnum } from './platforms.models.ts'
-import { trendsTable, countryEnum } from './trends.models.ts'
+import { countryEnum, trendsTable } from './trends.models.ts'
 import { hashtagsTable, velocityEnum } from './hashtags.models.ts'
 import { trendAnalyticsTable } from './trendAnalytics.models.ts'
 import { platformFetchLogsTable, fetchTypeEnum, fetchStatusEnum } from './platformFetchLogs.models.ts'
