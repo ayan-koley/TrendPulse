@@ -21,7 +21,7 @@ export type TrendingTopics = {
     engagement_count: number;
     post_count: number;
     rank_position: number;
-    rank_change: number;
+    rank_change?: number;
     related_hashtags: string[];
     is_active: boolean;
     first_detected_at: Date;
