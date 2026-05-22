@@ -10,16 +10,19 @@ export function calculateTrendScore({
     postCount
 }: TrendScoreInput): number {
 
-    const normalizedEngagement = Math.log10(engagementCount + 1) * 20;
+    const normalizedEngagement =
+        Math.min(40, Math.log10(engagementCount + 1) * 5);
 
-    const normalizedPosts =  Math.log10(postCount + 1) * 15;
+    const normalizedPosts =
+        Math.min(30, Math.log10(postCount + 1) * 8);
+
+    const normalizedVelocity =
+        Math.min(30, velocityScore * 0.3);
 
     const score =
         normalizedEngagement +
-        velocityScore * 0.5 +
-        normalizedPosts;
+        normalizedPosts +
+        normalizedVelocity;
 
-    return Number(
-        Math.min(100, score).toFixed(2)
-    );
+    return +score.toFixed(2);
 }
