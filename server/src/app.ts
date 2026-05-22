@@ -1,4 +1,6 @@
 import express, { urlencoded } from 'express';
+import { processTrendingVideos } from './services/processors/youtube.processors.ts';
+import { startYoutubeCron } from './cron/youtube.cron.ts';
 
 const app = express();
 app.use(urlencoded({
@@ -11,5 +13,14 @@ app.use(express.json({
     limit: '100kb',
     strict: true,
 }))
+
+startYoutubeCron();
+
+import dashboardRoute from './routes/dashboard.routes.ts'
+
+app.use("/api/v1/dashboard", dashboardRoute);
+app.use("/api/v1/health", (req, res, next) => {
+    return res.status(200).json({message: "server is running"});
+})
 
 export default app;
