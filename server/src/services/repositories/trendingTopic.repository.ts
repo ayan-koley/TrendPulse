@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../../config/db.ts";
 import { platformsTable } from "../../models/platforms.models.ts";
 import { trendsTable } from "../../models/trends.models.ts";
@@ -44,7 +44,85 @@ const getActiveTopicsByPlatform = async(platformId: string) => {
     }
 }
 
+const upsertTrendingTopic = async(platformId: string,
+  trending: TrendingTopics) => {
+    try {
+        const isValidPlatformId = await db.select({id: platformsTable.id}).from(platformsTable).where(eq(platformsTable.id, platformId));
+
+        if(isValidPlatformId.length === 0) {
+            throw new Error("Send a valid platfromId on inserting trending topics");
+        }
+        
+        const result = await db
+                        .insert(trendsTable)
+                        .values({
+                            platform_id: isValidPlatformId[0].id,
+                            ...trending,
+                        })
+                        .onConflictDoUpdate({
+                            target: [trendsTable.platform_id, trendsTable.topic],
+                            set: {
+                                trend_score: sql`EXCLUDED.trend_score`,
+                                engagement_count: sql`EXCLUDED.engagement_count`,
+                                post_count: sql`EXCLUDED.post_count`,
+                                country: sql`EXCLUDED.country`,
+                                is_active:  true,
+                                last_updated_at:    sql`NOW()`,
+                            },
+                        }).returning()
+
+        return result;
+    } catch (error: any) {
+        console.error("ERROR cause on upser ", error.cause);
+    }
+}
+
+const updateRankPositions = async(platformId: string): Promise<void> => {
+    try {
+        await db.execute(sql`
+            UPDATE trends AS t
+            SET 
+                rank_change = COALESCE(t.rank_position, new_ranks.new_rank) - new_ranks.new_rank,
+                rank_position = new_ranks.new_rank,
+                last_updated_at = NOW()
+            FROM(
+                SELECT
+                id,
+                ROW_NUMBER() OVER(
+                    PARTITION  BY platform_id
+                    ORDER BY trend_score DESC
+                ) AS new_rank
+                FROM trends
+                WHERE platform_id = ${platformId}
+                AND is_active = true
+            ) AS new_ranks
+            WHERE t.id = new_ranks.id
+            AND t.platform_id = ${platformId}
+            `)
+
+    } catch (error: any) {
+        console.error("ERROR on update the rank ", error.cause);
+    }
+}
+
+const getTrendsByPlatform = async(platformId: string, limit: number = 50) => {
+    try {
+        return await db.select().from(trendsTable).where(
+            and(
+                eq(trendsTable.platform_id, platformId),
+                eq(trendsTable.is_active, true)
+            )
+        ).orderBy(trendsTable.rank_position)
+        .limit(limit)
+    } catch (error: any) {
+        console.error("ERROR on fetching trends by platform ", error.cause);
+    }
+}
+
 export {
     insertTrendingTopic,
-    getActiveTopicsByPlatform
+    getActiveTopicsByPlatform,
+    updateRankPositions,
+    upsertTrendingTopic,
+    getTrendsByPlatform
 }
