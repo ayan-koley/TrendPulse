@@ -4,7 +4,7 @@ import { platformsTable, trendsTable } from './index.ts'
 export const trendAnalyticsTable = pgTable('trend_analytics', {
     id: uuid('id').defaultRandom().primaryKey(),
     trend_id: uuid('trend_id').notNull().references(() => trendsTable.id),
-    trend_score: integer('trend_score').notNull(),
+    trend_score: numeric('trend_score', { precision: 5, scale: 2, mode: "number" }).notNull(),
     platform_id: uuid('platform_id').notNull().references(() => platformsTable.id),
     time_bucket: timestamp('time_bucket', { mode: 'date', withTimezone: true }).notNull(),
     hourly_growth: numeric('hourly_growth', { precision: 5, scale: 2, mode: "number" }), 
