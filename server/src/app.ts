@@ -1,6 +1,7 @@
 import express, { urlencoded } from 'express';
 import { processTrendingVideos } from './services/processors/youtube.processors.ts';
 import { startYoutubeCron } from './cron/youtube.cron.ts';
+import cors from 'cors'
 
 const app = express();
 app.use(urlencoded({
@@ -12,6 +13,11 @@ app.use(urlencoded({
 app.use(express.json({
     limit: '100kb',
     strict: true,
+}))
+
+app.use(cors({
+    origin: '*',
+    credentials: true,
 }))
 
 startYoutubeCron();
