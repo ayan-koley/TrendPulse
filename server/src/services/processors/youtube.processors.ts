@@ -9,6 +9,7 @@ import { groupVideosByHashtags } from "../trend/groupVideosByHashtag.ts";
 import { createTrendFromGroup } from "../trend/createTrendFromGroup.ts";
 import { calculateMetrics } from "../trend/calculateMetrics.ts";
 import { insertTrendAnalytics, type TrendAnalysis } from "../repositories/trendAnalysis.repositories.ts";
+import { extractVirtualHashtags } from "../trend/keywordExtractor.ts";
 
 type NormalizedYoutubeData = {
 //   trendingTopics: TrendingTopics;
@@ -27,7 +28,18 @@ export async function processTrendingVideos() {
         const endTime = Date.now();
         const normalizedRes: NormalizedYoutubeData[] = normalizeYouTube(youtubeResponse.items); 
 
-        const videos: NormalizedVideo[] = normalizedRes.map(res => res.normalizedVideo);
+        let videos: NormalizedVideo[] = normalizedRes.map(res => res.normalizedVideo);
+
+        videos = videos.map((video) => {
+            if(!video.hashtags || video.hashtags.length === 0) {
+                const fallbackTags = extractVirtualHashtags(video.title, video.description || "");
+                return {
+                    ...video,
+                    hashtags: fallbackTags
+                }
+            }
+            return video
+        })
 
         const groupedVideos: Map<string, NormalizedVideo[]> = groupVideosByHashtags(videos)
         
