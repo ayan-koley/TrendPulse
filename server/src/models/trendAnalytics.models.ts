@@ -13,5 +13,7 @@ export const trendAnalyticsTable = pgTable('trend_analytics', {
     viral_probability: numeric('viral_probability', { precision: 3, scale: 2, mode: "number" }), 
     post_count: integer('post_count').default(0).notNull(),
     top_countries: text('top_countries').array().default([]),
+    velocity_score: numeric('velocity_score', { precision: 5, scale: 2, mode: "number" }).notNull(), 
+    totalEngagement: integer('engagement_count').default(0).notNull(),
     created_at: timestamp('created_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
 })
