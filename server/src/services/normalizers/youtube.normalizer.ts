@@ -49,6 +49,7 @@ export type NormalizedVideo = {
     views: number;
     lang: string;
     category: string;
+    description: string;
 }
 
 export function normalizeYouTube(items: Item[]) {
@@ -67,6 +68,7 @@ export function normalizeYouTube(items: Item[]) {
 
         const normalizedVideo: NormalizedVideo = {
             title: snippet.title,
+            description: snippet.description,
             country,
             engagement,
             hashtags,
