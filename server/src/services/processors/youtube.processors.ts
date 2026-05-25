@@ -8,8 +8,10 @@ import { incrementPlatformRequestUsedById } from "../../platforms/updater/platfo
 import { groupVideosByHashtags } from "../trend/groupVideosByHashtag.ts";
 import { createTrendFromGroup } from "../trend/createTrendFromGroup.ts";
 import { calculateMetrics } from "../trend/calculateMetrics.ts";
-import { insertTrendAnalytics, type TrendAnalysis } from "../repositories/trendAnalysis.repositories.ts";
+import { insertTrendAnalytics, lastSnapshotResult, type TrendAnalysis } from "../repositories/trendAnalysis.repositories.ts";
 import { extractVirtualHashtags } from "../trend/keywordExtractor.ts";
+import type { TrendSnapshot } from "../trend/calculateVelocity.ts";
+import { calculateVelocityScore } from "../trend/calculateVelocity.ts";
 
 type NormalizedYoutubeData = {
 //   trendingTopics: TrendingTopics;
@@ -54,6 +56,11 @@ export async function processTrendingVideos() {
                 continue;
             }
 
+            const lastSnapshot: TrendSnapshot = await lastSnapshotResult(platformId, trend[0].id);
+
+
+            const {velocityScore, hourlyGrowth} = calculateVelocityScore({postCount: metrics.postCount, totalEngagement: metrics.engagementCount}, lastSnapshot);
+
             await insertTrendAnalytics({
                 platform_id: platformId,
                 trend_id: trend[0].id,
@@ -62,7 +69,9 @@ export async function processTrendingVideos() {
                 time_bucket: new Date(),
                 top_countries: metrics.topCountries,
                 created_at: new Date(),
-                trend_score: trend[0].trend_score
+                trend_score: trend[0].trend_score,
+                velocity_score: velocityScore,
+                hourly_growth: hourlyGrowth
             })
         }
 
