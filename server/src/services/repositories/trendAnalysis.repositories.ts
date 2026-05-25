@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../../config/db.ts";
 import { trendAnalyticsTable } from "../../models/trendAnalytics.models.ts";
 import { platformsTable } from "../../models/platforms.models.ts";
@@ -15,7 +15,8 @@ export type TrendAnalysis = {
     post_count: number,
     top_countries: string[],
     created_at: Date,
-    trend_score: number
+    trend_score: number,
+    velocity_score: number
 } 
 
 const insertTrendAnalytics = async(trend: TrendAnalysis) => {
@@ -36,6 +37,28 @@ const insertTrendAnalytics = async(trend: TrendAnalysis) => {
     }
 }
 
+const lastSnapshotResult = async(platformId: string, trendId: string) => {
+    if(!platformId) {
+        throw new Error("Invalid platform id");
+    }
+
+    if(!trendId) {
+        throw new Error("Invalid trend id");
+    }
+
+    const trendAnalysis = await db.select({postCount: trendAnalyticsTable.post_count, totalEngagement: trendAnalyticsTable.totalEngagement})
+    .from(trendAnalyticsTable)
+    .where(and(
+        eq(trendAnalyticsTable.platform_id, platformId),
+        eq(trendAnalyticsTable.trend_id, trendId)
+    ))
+    .orderBy(desc(trendAnalyticsTable.time_bucket))
+    .limit(1);
+
+    return trendAnalysis[0];
+}
+
 export {
-    insertTrendAnalytics
+    insertTrendAnalytics,
+    lastSnapshotResult
 }
