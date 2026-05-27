@@ -131,9 +131,19 @@ const refreshRefreshToken = asyncHandler(async (req: Request, res: Response) => 
     );
 });
 
+const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    return res.status(200)
+    .json(
+        ApiResponse.success(user, "Current user retrieved successfully")
+    );
+});
+
 export {
     createUser,
     loginUser,
     logoutUser,
-    refreshRefreshToken
+    refreshRefreshToken,
+    getCurrentUser
 }   
