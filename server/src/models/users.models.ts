@@ -19,6 +19,7 @@ export const usersTable = pgTable('users', {
     interests: text('interests').array().default([]),
     avatar_url: varchar('avatar_url', { length: 500 }).default(''),
     is_verified: boolean().default(false),
+    refresh_token: text('refresh_token').default(""),
     created_at: timestamp('created_at', { mode: 'date', withTimezone: true}).defaultNow().notNull(),
     updated_at: timestamp('updated_at', { mode: 'date', withTimezone: true}).defaultNow().notNull(),
 })
