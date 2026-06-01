@@ -119,10 +119,20 @@ const getTrendsByPlatform = async(platformId: string, limit: number = 50) => {
     }
 }
 
+const updateVelocityScore = async(trendId: string, velocityScore: number) => {
+    try {
+        await db.update(trendsTable).set({ velocity_score: velocityScore}).where(eq(trendsTable.id, trendId));
+    } catch (error: any) {
+        console.error("ERROR on update the velocity score ", error.message);
+    }
+
+}
+
 export {
     insertTrendingTopic,
     getActiveTopicsByPlatform,
     updateRankPositions,
     upsertTrendingTopic,
-    getTrendsByPlatform
+    getTrendsByPlatform,
+    updateVelocityScore
 }
