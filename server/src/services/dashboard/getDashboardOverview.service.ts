@@ -14,10 +14,15 @@ export const getDashboardOverviewService =
             throw new Error("Unable to fetch top trends for dashboard overview");
         }
 
-        for(const trend of topTrends) {
-            const sparklineData: number[] = await getSparklineData(trend.id);
-            (trend as any).sparkline = sparklineData;
-        }
+        const trendWithSparkline = await Promise.all(
+            topTrends.map(async(trend) => {
+                const sparkline = await getSparklineData(trend.id);
+                return {
+                    ...trend,
+                    sparkline
+                }
+            })
+        )
 
 
         // TODO:
@@ -46,7 +51,7 @@ export const getDashboardOverviewService =
             overview: {
               ...dashboardStats
             },
-            topTrends
+            topTrends: trendWithSparkline
         };
     } catch (error: any) {
         console.error("Error in getDashboardOverviewService:", error);
