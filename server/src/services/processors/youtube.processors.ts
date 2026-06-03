@@ -1,7 +1,7 @@
 import { generateYoutubeTrendingVideos, type YoutubeResponse } from "../collectors/youtube.service.ts";
 import { normalizeYouTube, type Hashtags, type NormalizedVideo, type TrendingTopics } from "../normalizers/youtube.normalizer.ts";
 import type { PlatformFetchLogs } from '../../platforms/types/platform.types.ts'
-import { insertTrendingTopic, updateRankPositions, upsertTrendingTopic } from "../repositories/trendingTopic.repository.ts";
+import { insertTrendingTopic, updateRankPositions, updateVelocityScore, upsertTrendingTopic } from "../repositories/trendingTopic.repository.ts";
 import { insertHashtags } from "../repositories/hashtags.repositories.ts";
 import { insertPlatformFetchLogs } from "../repositories/platformFetchLogs.repositories.ts";
 import { incrementPlatformRequestUsedById } from "../../platforms/updater/platform.updater.ts";
@@ -20,7 +20,7 @@ type NormalizedYoutubeData = {
 };
 
 export async function processTrendingVideos() {
-    const platformId: string = process.env.YOUTUBE_PLATFROM_ID!;
+    const platformId: string = process.env.YOUTUBE_PLATFORM_ID!;
     if(!platformId) {
         throw new Error("Platformid is undefined");
     }
@@ -56,14 +56,16 @@ export async function processTrendingVideos() {
                 continue;
             }
 
-            const lastSnapshot: TrendSnapshot = await lastSnapshotResult(platformId, trend[0].id);
+            const trendId = trend[0].id;
+
+            const lastSnapshot: TrendSnapshot = await lastSnapshotResult(platformId, trendId);
 
 
             const {velocityScore, hourlyGrowth} = calculateVelocityScore({postCount: metrics.postCount, totalEngagement: metrics.engagementCount}, lastSnapshot);
 
             await insertTrendAnalytics({
                 platform_id: platformId,
-                trend_id: trend[0].id,
+                trend_id: trendId,
                 engagement_rate: metrics.engagementRate,
                 post_count: metrics.postCount,
                 time_bucket: new Date(),
@@ -73,6 +75,9 @@ export async function processTrendingVideos() {
                 velocity_score: velocityScore,
                 hourly_growth: hourlyGrowth
             })
+
+            // i need to update the velocity score in the trending topics also 
+            await updateVelocityScore(trendId, velocityScore);
         }
 
         await updateRankPositions(platformId);
