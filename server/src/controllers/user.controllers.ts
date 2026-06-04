@@ -7,7 +7,18 @@ import { usersTable } from "../models/users.models.ts";
 import { ApiResponse } from "../utils/ApiResponse.ts";
 import * as z from 'zod';
 import { eq } from "drizzle-orm";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt.utils.ts";
+import { generateAccessToken, generateRefreshToken, type TokenPayload } from "../utils/jwt.utils.ts";
+
+const generateAccessAndRefreshTokens = (user: TokenPayload) => {
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+    return { accessToken, refreshToken };
+}
+
+const updateRefreshToken = async (userId: string, refreshToken: string | null) => {
+    const [user] = await db.update(usersTable).set({refresh_token: refreshToken}).where(eq(usersTable.id, userId)).returning({id: usersTable.id, email: usersTable.email, username: usersTable.username, role: usersTable.role});
+    return user;
+}
 
 const createUser = asyncHandler(async (req: Request, res: Response) => {
     const validation = createUserSchema.safeParse(req.body);
@@ -21,7 +32,7 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     const { username, email, password, role, subscriptionPlan, isVerified } = validation.data;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    await db.insert(usersTable).values({
+    const [user] = await db.insert(usersTable).values({
         username,
         email,
         password_hash: passwordHash,
@@ -30,10 +41,15 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
         is_verified: isVerified,
         created_at: new Date(),
         updated_at: new Date(),
-    });
+    }).returning({id: usersTable.id, email: usersTable.email, username: usersTable.username, role: usersTable.role});
+
+    const { accessToken, refreshToken } = generateAccessAndRefreshTokens({userId: user.id, email: user.email, role: user.role});
+
+    await updateRefreshToken(user.id, refreshToken);
+
 
     return res.status(201).json(
-        ApiResponse.success(null, "User created successfully")
+        ApiResponse.success(user, "User created successfully")
     );
 });
 
@@ -69,7 +85,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
         role: user.role,
     });
 
-    await db.update(usersTable).set({refresh_token: refreshToken}).where(eq(usersTable.id, user.id));
+    const userDetails = await updateRefreshToken(user.id, refreshToken);
 
     return res.status(200)
     .cookie("refreshToken", refreshToken, {
@@ -85,7 +101,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
         maxAge: 15 * 60 * 1000 // 15 minutes
     })
     .json(
-        ApiResponse.success({ accessToken, refreshToken }, "User logged in successfully")
+        ApiResponse.success({ accessToken, refreshToken, user: userDetails }, "User logged in successfully")
     );
 });
 
@@ -136,7 +152,7 @@ const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
 
     return res.status(200)
     .json(
-        ApiResponse.success(user, "Current user retrieved successfully")
+        ApiResponse.success({user: user}, "Current user retrieved successfully")
     );
 });
 
