@@ -19,9 +19,9 @@ export type UpdatePlatformPayload = Partial<{
 
 export type PlatformFetchLogs = {
     fetch_type: FetchType,
-    records_fetched: number,
+    records_fetched?: number,
     status: FetchStatus,
     error_message?: string,
-    duration_ms: number,
+    duration_ms?: number,
     fetched_at: Date
 }
