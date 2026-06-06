@@ -3,7 +3,7 @@ import { processTrendingVideos } from '../services/processors/youtube.processors
 
 
 export const startYoutubeCron = (): void => {
-    corn.schedule("*/15 * * * *", async() => {
+    corn.schedule("0 */1 * * *", async() => {
         console.log("Running youtube cron job");
         await processTrendingVideos();
     })
