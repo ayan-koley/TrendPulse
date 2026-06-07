@@ -15,6 +15,7 @@ export const platformsTable = pgTable('platforms', {
     api_status: apiStatusEnum('api_status').default('active').notNull(),
     rate_limit: integer('rate_limit').notNull(), 
     requests_used: integer('requests_used').default(0).notNull(),
+    cool_down_until: timestamp('cool_down_until', { mode: 'date', withTimezone: true }),
     last_fetched_at: timestamp('last_fetched_at', { mode: 'date', withTimezone: true }),
     is_enabled: boolean('is_enabled').default(true).notNull(),
     created_at: timestamp('created_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
