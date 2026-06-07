@@ -1,5 +1,6 @@
-import { integer, pgEnum, pgTable, varchar, text, numeric, timestamp, uuid, boolean, unique } from 'drizzle-orm/pg-core'
+import { integer, pgEnum, pgTable, varchar, text, numeric, timestamp, uuid, boolean, unique, jsonb } from 'drizzle-orm/pg-core'
 import { platformsTable } from './platforms.models.ts'
+import type { AISuggestionsPayload, HistoricalGraphNode, PlatformDataBucket } from '../types/index.ts';
 
 export const countries = ["US", "IN", "UK", "CA", "AU", "DE", "FR", "JP", "ES", "BR", "KR", "SA"] as const;
 
@@ -11,25 +12,13 @@ export const trendsTable = pgTable('trends', {
     id: uuid('id').defaultRandom().primaryKey(),
     topic: varchar('topic', { length: 500 }).notNull(),
     category: varchar('category').notNull(),
-    platform_id: uuid('platform_id').notNull().references(() => platformsTable.id),
-    country: countryEnum('country').notNull(),
-    language: varchar('language', { length: 50 }).notNull().default('en'),
-    trend_score: numeric('trend_score', { precision: 5, scale: 2, mode: "number" }).notNull(),
-    velocity_score: numeric('velocity_score', { precision: 5, scale: 2, mode: "number" }).notNull(), 
-    sentiment_score: numeric('sentiment_score', { precision: 3, scale: 2, mode: "number" }).notNull(),
-    engagement_count: integer('engagement_count').default(0).notNull(),
-    post_count: integer('post_count').default(0).notNull(),
-    rank_position: integer('rank_position').default(0),
-    rank_change: integer('rank_change'), 
-    related_hashtags: text('related_hashtags').array().default([]),
+    country: countryEnum('country'),
+    overall_trend_score: numeric('trend_score', { precision: 5, scale: 2, mode: "number" }).notNull(),
+    status: varchar('status', { length: 50 }).notNull(),
+    metrics: jsonb('metrics').$type<PlatformDataBucket>().default({}).notNull(),
+    historical_graph_data: jsonb('historical_graph_data').$type<HistoricalGraphNode[]>().default([]).notNull(),
+    ai_suggestions: jsonb('ai_suggestions').$type<AISuggestionsPayload>().default({ titleHooks: [], scriptHook: '' }).notNull(),
     is_active: boolean('is_active').default(true).notNull(),
     first_detected_at: timestamp('first_detected_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
     last_updated_at: timestamp('last_updated_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
-}, (table) => (
-    {
-        uniquePlatformTopic: unique().on(
-            table.platform_id,
-            table.topic
-        )
-    }
-))
+},)
