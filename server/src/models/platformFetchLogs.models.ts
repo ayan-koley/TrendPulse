@@ -18,5 +18,5 @@ export const platformFetchLogsTable = pgTable('platform_fetch_logs', {
     status: fetchStatusEnum('status').notNull(),
     error_message: text('error_message'),
     duration_ms: integer('duration_ms'),
-    created_at: timestamp('created_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
+    fetched_at: timestamp('fetched_at', { mode: 'date', withTimezone: true }).defaultNow().notNull(),
 })
