@@ -42,3 +42,11 @@ export interface AISuggestionsPayload {
     titleHooks: string[];
     scriptHook: string;
 }
+
+export interface ScrapedTrendPayload {
+  topic: string;
+  category: string;
+  summary: string;
+  metrics: PlatformDataBucket;
+  aiSuggestions: AISuggestionsPayload;
+}
