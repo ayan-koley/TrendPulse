@@ -13,7 +13,7 @@ export const verifyToken = asyncHandler(async (req: Request, res: Response, next
                 return res.status(401).json({ message: "Access token not found" });
             }
             const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET as string) as JwtPayload;
-            const [user] = await db.select({id: usersTable.id, email: usersTable.email, username: usersTable.username}).from(usersTable).where(eq(usersTable.id, decoded.userId)).limit(1);
+            const [user] = await db.select({id: usersTable.id, email: usersTable.email, username: usersTable.username, role: usersTable.role}).from(usersTable).where(eq(usersTable.id, decoded.userId)).limit(1);
 
             if (!user) {
                 throw ApiResponse.error("Unauthorized User", null);
