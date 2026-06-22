@@ -1,6 +1,4 @@
 import express, { urlencoded } from 'express';
-import { processTrendingVideos } from './services/processors/youtube.processors.ts';
-import { startYoutubeCron } from './cron/youtube.cron.ts';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 
@@ -23,13 +21,12 @@ app.use(cors({
 
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-startYoutubeCron();
 
-import dashboardRoute from './routes/dashboard.routes.ts'
 import userRoute from './routes/user.routes.ts'
+import trendRoute from './routes/trend.routes.ts'
 
-app.use("/api/v1/dashboard", dashboardRoute);
 app.use("/api/v1/users", userRoute);
+app.use("/api/v1/trends", trendRoute);
 app.use("/api/v1/health", (req, res, next) => {
     return res.status(200).json({message: "server is running"});
 })
